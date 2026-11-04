@@ -19,6 +19,7 @@ package com.example.makeitso.common.snackbar
 import android.content.res.Resources
 import androidx.annotation.StringRes
 import com.example.makeitso.R.string as AppText
+import com.google.firebase.auth.FirebaseAuthException
 
 sealed class SnackbarMessage {
   class StringSnackbar(val message: String) : SnackbarMessage()
@@ -33,6 +34,9 @@ sealed class SnackbarMessage {
     }
 
     fun Throwable.toSnackbarMessage(): SnackbarMessage {
+      if (this is FirebaseAuthException) {
+        return StringSnackbar("Firebase ${errorCode}: ${message.orEmpty()}")
+      }
       val message = this.message.orEmpty()
       return if (message.isNotBlank()) StringSnackbar(message)
       else ResourceSnackbar(AppText.generic_error)
